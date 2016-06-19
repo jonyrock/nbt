@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var pg = require('pg');
+var _ = require('lodash');
 
 var connectionString = process.env.DATABASE_URL || 'postgres://corp:qwer@localhost:5432/nbt';
 
@@ -8,6 +9,8 @@ var client = new pg.Client(connectionString);
 client.connect();
 
 var QUERY_STEP_SIZE = 50;
+
+var REGIONS = [77, 78, 54, 66, 52];
 
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/public/index.html');
@@ -39,15 +42,15 @@ function computeGeoms(n, callback) {
     var query = client.query(getQuery(n));
 
     var wasRow = false;
-    var res = {
-      77: [],
-      78: [4, 1, 1]
-    }
-
+    var res = {}
+    
+    _.each(REGIONS, r => {
+      res[r] = [];
+    })
+    
     query.on('row', function(row) {
       wasRow = true;
-      // TODO: process data
-      res[77].push(row);
+      res[+row.regioncode].push(row);
     });
 
     query.on('end', function(data) {
@@ -60,9 +63,16 @@ function computeGeoms(n, callback) {
   });
 }
 
+var REGIONS_SQL = "('" + REGIONS.join("','") + "')";
+
 function getQuery(n) {
-  var offset = n * QUERY_STEP_SIZE;
-  return `select * from addrobj limit ${QUERY_STEP_SIZE} OFFSET ${offset}`;
+  return `
+    SELECT * from addrobj
+    WHERE aolevel = '7' and regioncode in ${REGIONS_SQL}
+    ORDER BY public.addrobj.aoid
+    LIMIT ${QUERY_STEP_SIZE}
+    OFFSET ${n * QUERY_STEP_SIZE}  
+  `;
 }
 
 
