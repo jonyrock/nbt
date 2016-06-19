@@ -103,7 +103,7 @@ function precalcFromDB() {
     function dropFile() {
       var num = Math.ceil(rowCount / QUERY_STEP_SIZE);
       fs.writeFile(
-        __dirname + '/data/' + num + ".json", 
+        __dirname + 'public/data/' + num + ".json", 
         JSON.stringify(res), 
         function(err) {
           if(err) {
