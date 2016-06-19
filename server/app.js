@@ -1,5 +1,12 @@
 var express = require('express');
 var app = express();
+var pg = require('pg');
+
+var connectionString = process.env.DATABASE_URL || 'postgres://corp:qwer@localhost:5432/nbt';
+
+var client = new pg.Client(connectionString);
+client.connect();
+
 
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/public/index.html');
@@ -13,20 +20,48 @@ app.listen(3000, function () {
 
 app.get('/frame/:id(\\d+)', function (req, res) {
   var n = +req.params['id'];
-  res.setHeader('Content-Type', 'application/json');
-  res.sendFile(__dirname + '/public/index.html');
-
-  res.send(
-    JSON.stringify(computeGeoms(n))
-  );
+  computeGeoms(n, function(data) {
+    res.setHeader('Content-Type', 'application/json');
+    res.sendFile(__dirname + '/public/index.html');
+    res.send(JSON.stringify(data))
+  });
 });
 
+function computeGeoms(n, callback) {
+  pg.connect(connectionString, function(err, client, done) {
+    
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({ success: false, data: err});
+    }
+    
+    var query = client.query(getQuery(n));
+    
+    var wasRow = false;
+    var res = {
+      77: [],
+      78: [4, 1, 1]
+    }
 
-function computeGeoms(n) {
-  return {
-    77: [1, 2, 3],
-    78: [4, 1, 1]
-  }
+    query.on('row', function(row) {
+      wasRow = true;
+      // TODO: process data
+      res[77].push(row);
+    });
+
+    query.on('end', function(data) {
+      done();
+      if(!wasRow) {
+        res = { end: true };
+      }
+      callback(res);
+    });
+  });
+}
+
+function getQuery(n) {
+  return 'select * from addrobj limit 50';
 }
 
 
