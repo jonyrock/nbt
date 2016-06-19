@@ -73,9 +73,9 @@ App.drawStreet = function(cityId) {
     REGIONS[cityId].center[0] + length, REGIONS[cityId].center[1],
     360 * Math.random()
   );
-  
-  length = Math.random() * 2;
-  
+
+  length = Math.random() * 1.5;
+
   var pb = rotate(
     pa[0], pa[1], pa[0] + length, pa[1], 360 * Math.random()
   );
@@ -95,7 +95,7 @@ App.drawBuilding = function(cityId) {
   );
   ctx.beginPath();
   ctx.beginPath();
-  ctx.arc(x(pa[0]), y(pa[1]), 3, 0, 2 * Math.PI, false);
+  ctx.arc(x(pa[0]), y(pa[1]), 2, 0, 2 * Math.PI, false);
   ctx.lineWidth = 0.3;
   ctx.strokeStyle = REGIONS[cityId].color;
   ctx.stroke();

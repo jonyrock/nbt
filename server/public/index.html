@@ -12,12 +12,30 @@
 
 <style>
   body, html { width: 100%; height: 100%; margin: 0; padding: 0}
+  #labels { position: absolute; top: 0; left: 0; width: 100%; height: 100%}
+  #labels span {
+    position: absolute; padding: 4px; background: white; 
+    color: black; font-size: 10px;
+    font-family: Verdana
+  }
+  #label77 { left: 50%; top: 50% }
+  #label78 { left: 20%; top: 20% }
+  #label54 { left: 80%; top: 20% }
+  #label66 { left: 20%; top: 80% }
+  #label52 { left: 80%; top: 80% }
 </style>
 
 </head>
 
 <body>
   <canvas id="canvas"></canvas>
+  <div id="labels">
+    <span id="label77">Москва и область</span>
+    <span id="label78">СПБ и Лен.область</span>
+    <span id="label54">Новосибирская область</span>
+    <span id="label66">Свердловская область</span>
+    <span id="label52">Нижегородская область</span>
+  </div>
 </body>
 
 </html>
