@@ -1,17 +1,30 @@
 var App = {}
 
 var ctx = undefined;
+var canvas;
 
 App.N = 0;
 
-App.init = function() {
-  App.N = 0;
-  ctx = document.getElementById("canvas").getContext("2d");
-  ctx.fillStyle = "#FF0000";
-  ctx.fillRect(0,0,150,75);
-  App.initNextFrameRequest();
+function x(f) {
+  return (f / 100) * canvas.width;
 }
 
+function y(f) {
+  return (f / 100) * canvas.height;
+}
+
+App.init = function() {
+  App.N = 0;
+  canvas = document.getElementById("canvas");
+  ctx = canvas.getContext("2d");
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  ctx.fillStyle = "#FF0000";
+  ctx.fillRect(0, 0, x(50), y(50));
+  App.initNextFrameRequest();
+  
+}
 App.initNextFrameRequest = function() {
   $.get('/frame/' + App.N, function(data) {
     if(data.end) {
