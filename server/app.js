@@ -50,7 +50,7 @@ function computeGeoms(n, callback) {
     
     query.on('row', function(row) {
       wasRow = true;
-      res[+row.regioncode].push(row);
+      res[+row.regioncode].push(row.size);
     });
 
     query.on('end', function(data) {
@@ -67,12 +67,17 @@ var REGIONS_SQL = "('" + REGIONS.join("','") + "')";
 
 function getQuery(n) {
   return `
-    SELECT * from addrobj
-    WHERE aolevel = '7' and regioncode in ${REGIONS_SQL}
-    ORDER BY public.addrobj.aoid
+    SELECT a.regioncode, COUNT(b.aoid) as size
+    FROM public.addrobj AS a
+    LEFT JOIN public.addrobj AS b
+    ON b.parentguid = a.aoid
+    WHERE a.aolevel = '7' and a.regioncode in ${REGIONS_SQL}
+    GROUP BY(a.aoid, a.regioncode)
     LIMIT ${QUERY_STEP_SIZE}
     OFFSET ${n * QUERY_STEP_SIZE}  
   `;
 }
+
+console.log(getQuery(1));
 
 
