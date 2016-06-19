@@ -78,6 +78,4 @@ function getQuery(n) {
   `;
 }
 
-console.log(getQuery(1));
-
 

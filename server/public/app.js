@@ -5,6 +5,14 @@ var canvas;
 
 App.N = 0;
 
+var REGIONS = {
+  77: { color: '#1f77b400' },
+  78: { color: '#ff7f0e00' },
+  54: { color: '#2ca02c' },
+  66: { color: '#d62728' },
+  52: { color: '#9467bd' }
+}
+
 function x(f) {
   return (f / 100) * canvas.width;
 }
@@ -20,8 +28,6 @@ App.init = function() {
   canvas.width  = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  ctx.fillStyle = "#FF0000";
-  ctx.fillRect(0, 0, x(50), y(50));
   App.initNextFrameRequest();
   
 }
@@ -39,18 +45,22 @@ App.initNextFrameRequest = function() {
 }
 
 App.onNextFrame = function(frameData) {
+  _.each(frameData, function(v, k) {
+    App.drawStreet(k, v);
+  });
+}
+
+App.drawStreet = function(cityId, size) {
   function r() {
     return Math.random() * 100;
   }
-  // TODO: process data
-  for(var cityId in frameData) {
-    ctx.beginPath();
-    ctx.moveTo(x(r()), y(r()));
-    ctx.lineTo(x(r()), y(r()));
-    ctx.closePath();
-    ctx.strokeStyle = 'green';
-    ctx.stroke();
-  }
+  // TODO: use size
+  ctx.beginPath();
+  ctx.moveTo(x(r()), y(r()));
+  ctx.lineTo(x(r()), y(r()));
+  ctx.closePath();
+  ctx.strokeStyle = REGIONS[cityId].color
+  ctx.stroke();
 }
 
 App.getRandomPosToCity = function() {
