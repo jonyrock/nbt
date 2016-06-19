@@ -22,42 +22,59 @@ function y(f) {
 }
 
 App.init = function() {
-  App.N = 0;
+  App.N = 1;
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
   canvas.width  = window.innerWidth;
   canvas.height = window.innerHeight;
-
   App.initNextFrameRequest();
-  
 }
 
 App.initNextFrameRequest = function() {
-  $.get('/frame/' + App.N, function(data) {
+  $.get('/data/' + App.N + '.json', function(data) {
     if(data.end) {
       // TODO: special effect for this
       return;
     }
     App.onNextFrame(data);
     App.N++;
-    App.initNextFrameRequest();
+    setTimeout(App.initNextFrameRequest, 1000 / 20);
   });
 }
 
 App.onNextFrame = function(frameData) {
   _.each(frameData, function(v, k) {
-    App.drawStreet(k, v);
+    for(var i = 0; i < v.street; i++) {
+      App.drawStreet(+k, v);
+    }
+    for(var i = 0; i < v.building; i++) {
+      App.drawBuilding(+k, v);
+    }
   });
 }
 
-App.drawStreet = function(cityId, size) {
+App.drawStreet = function(cityId) {
+  function r() {
+    return Math.random() * 14 - 7;
+  }
+  ctx.beginPath();
+  var pa = [REGIONS[cityId].center[0] + r(), REGIONS[cityId].center[1] + r()];
+  var pb = [REGIONS[cityId].center[0], REGIONS[cityId].center[1]];
+  ctx.moveTo(x(pa[0]), y(pa[1]));
+  ctx.lineTo(x(pb[0]), y(pb[1]));
+  ctx.closePath();
+  ctx.strokeStyle = REGIONS[cityId].color
+  ctx.stroke();
+}
+
+App.drawBuilding = function(cityId) {
   function r() {
     return Math.random() * 20 - 10;
   }
   // TODO: use size
   ctx.beginPath();
   var pa = [REGIONS[cityId].center[0] + r(), REGIONS[cityId].center[1] + r()];
-  var pb = [REGIONS[cityId].center[0], REGIONS[cityId].center[1]];
+  var pb = [pa[0] + 1, pa[1] + 1];
   ctx.moveTo(x(pa[0]), y(pa[1]));
   ctx.lineTo(x(pb[0]), y(pb[1]));
   ctx.closePath();
