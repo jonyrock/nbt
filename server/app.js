@@ -7,6 +7,7 @@ var connectionString = process.env.DATABASE_URL || 'postgres://corp:qwer@localho
 var client = new pg.Client(connectionString);
 client.connect();
 
+var QUERY_STEP_SIZE = 50;
 
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/public/index.html');
@@ -29,15 +30,14 @@ app.get('/frame/:id(\\d+)', function (req, res) {
 
 function computeGeoms(n, callback) {
   pg.connect(connectionString, function(err, client, done) {
-    
     if(err) {
       done();
       console.log(err);
-      return res.status(500).json({ success: false, data: err});
+      return callback(undefined);
     }
-    
+
     var query = client.query(getQuery(n));
-    
+
     var wasRow = false;
     var res = {
       77: [],
@@ -61,7 +61,8 @@ function computeGeoms(n, callback) {
 }
 
 function getQuery(n) {
-  return 'select * from addrobj limit 50';
+  var offset = n * QUERY_STEP_SIZE;
+  return `select * from addrobj limit ${QUERY_STEP_SIZE} OFFSET ${offset}`;
 }
 
 

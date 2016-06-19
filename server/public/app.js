@@ -25,6 +25,7 @@ App.init = function() {
   App.initNextFrameRequest();
   
 }
+
 App.initNextFrameRequest = function() {
   $.get('/frame/' + App.N, function(data) {
     if(data.end) {
@@ -38,9 +39,22 @@ App.initNextFrameRequest = function() {
 }
 
 App.onNextFrame = function(frameData) {
+  function r() {
+    return Math.random() * 100;
+  }
   // TODO: process data
-  console.log(frameData);
+  for(var cityId in frameData) {
+    ctx.beginPath();
+    ctx.moveTo(x(r()), y(r()));
+    ctx.lineTo(x(r()), y(r()));
+    ctx.closePath();
+    ctx.strokeStyle = 'green';
+    ctx.stroke();
+  }
 }
 
+App.getRandomPosToCity = function() {
+  
+}
 
 $(App.init);
